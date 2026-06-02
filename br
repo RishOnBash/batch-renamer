@@ -1,0 +1,84 @@
+#!/usr/bin/env bash
+
+usage() {
+    echo "Usage: ${0##*/} [Option] [Argument]"
+    echo "  -a      Add extension"
+    echo "  -e      Change extension"
+    echo "  -n      Numeric naming (default prefix: 'file')"
+    echo "  -u      Change file name (UUID)"
+    echo "  -t      Change file name (timestamp)"
+    echo "  -r      Change file name (/dev/urandom)"
+    echo "  -h      Display this help message"
+}
+
+(($# < 1)) && { usage; exit 1; }
+
+add_ext() {
+    for f in *; do
+        [[ -e "$f" ]] || { echo "No files found. Exiting!"; return 1; }
+        [[ -z "$1" ]] && { echo "No extension given. Exiting!"; return 1; }
+        [[ -f "$f" ]] || continue
+        mv "$f" "${f}.${1}"
+    done
+}
+
+chg_ext() {
+    for f in *; do
+        [[ -e "$f" ]] || { echo "No files found. Exiting!"; return 1; }
+        [[ -z "$1" ]] && { echo "No extension given. Exiting!"; return 1; }
+        [[ -f "$f" ]] || continue
+        mv "$f" "${f%.*}.${1}"
+    done
+}
+
+uuid_name() {
+    for f in *; do
+        [[ -e "$f" ]] || { echo "No files found. Exiting!"; return 1; }
+        [[ -f "$f" ]] || continue
+        mv "$f" "$(uuidgen).${f##*.}"
+    done
+}
+
+time_name() {
+    local count=1
+    for f in *; do
+        [[ -e "$f" ]] || { echo "No files found. Exiting!"; return 1; }
+        [[ -f "$f" ]] || continue
+        local datetime=$(date +"%Y%m%d_%H%M%S")
+        local pad_count=$(printf "%02d" "$count") 
+        mv "$f" "${datetime}_${pad_count}.${f##*.}"
+        ((count++))
+    done
+}
+
+num_name() {
+    local count=1
+    for f in *; do
+        [[ -e "$f" ]] || { echo "No files found. Exiting!"; return 1; }
+        [[ -f "$f" ]] || continue
+        local pad_count=$(printf "%02d" "$count")
+        mv "$f" "${1:-file}_${pad_count}.${f##*.}"
+        ((count++))
+    done
+}
+
+rand_name() {
+    for f in *; do
+        [[ -e "$f" ]] || { echo "No files found. Exiting!"; return 1; }
+        [[ -f "$f" ]] || continue
+        local rand=$(tr -cd 'a-z0-9' </dev/urandom | head -c15)
+        mv "$f" "${rand}.${f##*.}"
+    done
+}
+
+case "$1" in
+    -a ) add_ext "$2" ;;
+    -e ) chg_ext "$2" ;;
+    -u ) uuid_name ;;
+    -t ) time_name ;;
+    -n ) num_name "$2" ;;
+    -r ) rand_name ;;
+    -h ) usage ;;
+    * ) echo "Invalid option: $1"
+        echo "Try, ${0##*/} -h to see usage"; exit 1 ;;
+esac
