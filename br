@@ -3,7 +3,8 @@
 usage() {
     echo "Usage: ${0##*/} [Option] [Argument]"
     echo "  -a      Add extension"
-    echo "  -e      Change extension"
+    echo "  -e      Change specific extension"
+    echo "  -f      Force change extension"
     echo "  -n      Numeric naming (default prefix: 'file')"
     echo "  -u      Change file name (UUID)"
     echo "  -t      Change file name (timestamp)"
@@ -23,6 +24,18 @@ add_ext() {
 }
 
 chg_ext() {
+    for f in *; do
+        [[ -e "$f" ]] || { echo "No files found. Exiting!"; return 1; }
+        if [[ -z "$1" ]] || [[ -z "$2" ]]; then
+            echo "Requires two arguments. Exiting!"
+            return 1
+        fi
+        [[ -f "$f" ]] || continue
+        mv "$f" "${f//.$1/.$2}" 2> /dev/null
+    done
+}
+
+chg_all() {
     for f in *; do
         [[ -e "$f" ]] || { echo "No files found. Exiting!"; return 1; }
         [[ -z "$1" ]] && { echo "No extension given. Exiting!"; return 1; }
@@ -73,7 +86,8 @@ rand_name() {
 
 case "$1" in
     -a ) add_ext "$2" ;;
-    -e ) chg_ext "$2" ;;
+    -e ) chg_ext "$2" "$3" ;;
+    -f ) chg_all "$2" ;;
     -u ) uuid_name ;;
     -t ) time_name ;;
     -n ) num_name "$2" ;;
