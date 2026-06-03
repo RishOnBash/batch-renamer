@@ -1,16 +1,5 @@
 #!/usr/bin/env bash
 
-usge() {
-    echo "Usage: ${0##*/} [Option] [Argument]"
-    echo "  -a      Add extension"
-    echo "  -e      Replace extension"
-    echo "  -f      Force change extension"
-    echo "  -n      Numeric naming (default prefix: 'file')"
-    echo "  -u      Change file name (UUID)"
-    echo "  -t      Change file name (timestamp)"
-    echo "  -r      Change file name (/dev/urandom)"
-    echo "  -h      Display this help message"
-}
 usage() {
     cat << EOF
 Usage: ${0##*/} [OPTION] [ARGUMENT]
