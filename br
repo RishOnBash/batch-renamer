@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 
-usage() {
+usge() {
     echo "Usage: ${0##*/} [Option] [Argument]"
     echo "  -a      Add extension"
     echo "  -e      Replace extension"
@@ -10,6 +10,28 @@ usage() {
     echo "  -t      Change file name (timestamp)"
     echo "  -r      Change file name (/dev/urandom)"
     echo "  -h      Display this help message"
+}
+usage() {
+    cat << EOF
+Usage: ${0##*/} [OPTION] [ARGUMENT]
+
+A minimalist, high-performance batch file renamer.
+
+Options:
+    -a <ext>           Add extension to all files
+    -e <old> <new>     Replace a specific file extension
+    -f <ext>           Force change all extensions to a new type
+    -n [prefix]        Sequential numeric naming (Default: 'file_01.ext')
+    -u                 Rename files to unique UUIDv4 hashes
+    -t                 Rename files using a chronological timestamp
+    -r                 Rename files to random alphanumeric strings
+    -h                 Display this help message and exit
+
+Examples:
+    ${0##*/} -e mp4 mkv      Change all .mp4 files to .mkv
+    ${0##*/} -n photo        Rename files to photo_01, photo_02, etc.
+
+EOF
 }
 
 (($# < 1)) && { usage; exit 1; }

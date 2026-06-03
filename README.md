@@ -40,66 +40,89 @@ $ br
 make uninstall
 ```
 
-## Usage examples
+## Usage
 
-### Add extension
+```
+Usage: br [OPTION] [ARGUMENT]
 
-- Useful for one specific kind of file
+A minimalist, high-performance batch file renamer.
+
+Options:
+    -a <ext>           Add extension to all files
+    -e <old> <new>     Replace a specific file extension
+    -f <ext>           Force change all extensions to a new type
+    -n [prefix]        Sequential numeric naming (Default: 'file_01.ext')
+    -u                 Rename files to unique UUIDv4 hashes
+    -t                 Rename files using a chronological timestamp
+    -r                 Rename files to random alphanumeric strings
+    -h                 Display this help message and exit
+
+Examples:
+    br -e mp4 mkv      Change all .mp4 files to .mkv
+    br -n photo        Rename files to photo_01, photo_02, etc.
+```
+## Examples
+
+### Add extension (-a)
+Useful for one specific kind of file
 
 ```
 $ ls
 exploit  my_script  two-fer
-$
 $ br -a sh
-$
 $ ls
 exploit.sh  my_script.sh  two-fer.sh
 ```
 
-### Change extension
+### Replace specific extension (-e)
+Target and swap out only one explicit type of extension while leaving other file types alone.
+
 ```
 $ ls
-mydll.dll    myfile2.pdf  myvids2.mp4
-myfile1.pdf  myvids1.mp4  setup.exe
-$
+document.pdf  script.sh  video.mp4
 $ br -e mp4 mkv
-$
 $ ls
-mydll.dll    myfile2.pdf  myvids2.mkv
-myfile1.pdf  myvids1.mkv  setup.exe
+document.pdf  script.sh  video.mkv
+```
+
+### Force override all extensions (-f)
+Unify every regular file in the directory to a target extension, regardless of its original type.
+
+```
+$ ls
+data.txt  notes.docx  readme.md
+$ br -f txt
+$ ls
+data.txt  notes.txt  readme.txt
 ```
 
 ### UUID based naming
 
-- Recommended for large number of files.
+Recommended for large number of files.
 
 ```                                            
-$ br -u                              
-$                                              
+$ br -u                                             
 $ ls                                           
 24060a6e-52ee-4042-87ba-ffe92b1dc2e4.mkv        
 2f3933b8-8146-46bd-897f-0405f704d63f.mkv
 46102dda-ea2d-413f-bea0-e3dbe802c0f5.pdf        
 ```
-- Method remains same for -r and -t options
+> Note: The layout behavior is identical for the random (-r) and timestamp (-t) options.
 
-### Chronological naming
-
-- Uses default prefix (file) when no argument provided
+### Numeric naming
+Uses default prefix (file) when no argument provided
 
 ```
 $ br -n
-$
 $ ls
 file_01.pdf  file_03.mkv  file_05.exe
 file_02.mkv  file_04.pdf  file_06.dll
 ```
 
-- Pass an argument to use it as prefix here, vacation_videos
+Pass an argument to use it as prefix here, vacation_videos
 
 ```
 $ br -n vacation_videos
-$
 $ ls
 vacation_videos_01.mp4  vacation_videos_04.mp4
 vacation_videos_02.mp4  vacation_videos_05.mp4
