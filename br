@@ -3,7 +3,7 @@
 usage() {
     echo "Usage: ${0##*/} [Option] [Argument]"
     echo "  -a      Add extension"
-    echo "  -e      Change specific extension"
+    echo "  -e      Replace extension"
     echo "  -f      Force change extension"
     echo "  -n      Numeric naming (default prefix: 'file')"
     echo "  -u      Change file name (UUID)"
@@ -15,30 +15,33 @@ usage() {
 (($# < 1)) && { usage; exit 1; }
 
 add_ext() {
+    [[ -z "$1" ]] && { echo "Usage: br -a <ext>"; return 1; }
+
     for f in *; do
-        [[ -e "$f" ]] || { echo "No files found. Exiting!"; return 1; }
-        [[ -z "$1" ]] && { echo "No extension given. Exiting!"; return 1; }
+        [[ -e "$f" ]] || { echo "No files found!"; return 1; }
         [[ -f "$f" ]] || continue
         mv "$f" "${f}.${1}"
     done
 }
 
 chg_ext() {
-    if [[ -z "$1" ]] || [[ -z "$2" ]]; then
-        { echo "Requires two arguments. Exiting!"; return 1; }
-    fi
+    [[ -z "$1" ]] || [[ -z "$2" ]] && \
+        { echo "Usage: br -e <old_ext> <new_ext>"; return 1; }
     
     for f in *; do
-        [[ -e "$f" ]] || { echo "No files found. Exiting!"; return 1; }
+        [[ -e "$f" ]] || { echo "No files found!"; return 1; }
         [[ -f "$f" ]] || continue
-        mv "$f" "${f//.$1/.$2}" 2> /dev/null
+        if [[ "${f##*.}" == "$1" ]]; then
+            mv "$f" "${f%.$1}.$2" 2> /dev/null
+        fi
     done
 }
 
 chg_all() {
+    [[ -z "$1" ]] && { echo "Usage: br -f <ext>"; return 1; }
+
     for f in *; do
-        [[ -e "$f" ]] || { echo "No files found. Exiting!"; return 1; }
-        [[ -z "$1" ]] && { echo "No extension given. Exiting!"; return 1; }
+        [[ -e "$f" ]] || { echo "No files found!"; return 1; }
         [[ -f "$f" ]] || continue
         mv "$f" "${f%.*}.${1}"
     done
@@ -46,7 +49,7 @@ chg_all() {
 
 uuid_name() {
     for f in *; do
-        [[ -e "$f" ]] || { echo "No files found. Exiting!"; return 1; }
+        [[ -e "$f" ]] || { echo "No files found!"; return 1; }
         [[ -f "$f" ]] || continue
         mv "$f" "$(uuidgen).${f##*.}"
     done
@@ -55,7 +58,7 @@ uuid_name() {
 time_name() {
     local count=1
     for f in *; do
-        [[ -e "$f" ]] || { echo "No files found. Exiting!"; return 1; }
+        [[ -e "$f" ]] || { echo "No files found!"; return 1; }
         [[ -f "$f" ]] || continue
         local datetime=$(date +"%Y%m%d_%H%M%S")
         local pad_count=$(printf "%02d" "$count") 
@@ -67,7 +70,7 @@ time_name() {
 num_name() {
     local count=1
     for f in *; do
-        [[ -e "$f" ]] || { echo "No files found. Exiting!"; return 1; }
+        [[ -e "$f" ]] || { echo "No files found!"; return 1; }
         [[ -f "$f" ]] || continue
         local pad_count=$(printf "%02d" "$count")
         mv "$f" "${1:-file}_${pad_count}.${f##*.}"
@@ -77,7 +80,7 @@ num_name() {
 
 rand_name() {
     for f in *; do
-        [[ -e "$f" ]] || { echo "No files found. Exiting!"; return 1; }
+        [[ -e "$f" ]] || { echo "No files found!"; return 1; }
         [[ -f "$f" ]] || continue
         local rand=$(tr -cd 'a-z0-9' </dev/urandom | head -c15)
         mv "$f" "${rand}.${f##*.}"
