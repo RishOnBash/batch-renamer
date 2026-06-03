@@ -96,7 +96,7 @@ $ ls
 data.txt  notes.txt  readme.txt
 ```
 
-### UUID based naming
+### UUID based naming (-u)
 
 Recommended for large number of files.
 
@@ -109,7 +109,7 @@ $ ls
 ```
 > Note: The layout behavior is identical for the random (-r) and timestamp (-t) options.
 
-### Numeric naming
+### Numeric naming (-n)
 Uses default prefix (file) when no argument provided
 
 ```
