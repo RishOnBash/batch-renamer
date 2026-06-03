@@ -24,12 +24,12 @@ add_ext() {
 }
 
 chg_ext() {
+    if [[ -z "$1" ]] || [[ -z "$2" ]]; then
+        { echo "Requires two arguments. Exiting!"; return 1; }
+    fi
+    
     for f in *; do
         [[ -e "$f" ]] || { echo "No files found. Exiting!"; return 1; }
-        if [[ -z "$1" ]] || [[ -z "$2" ]]; then
-            echo "Requires two arguments. Exiting!"
-            return 1
-        fi
         [[ -f "$f" ]] || continue
         mv "$f" "${f//.$1/.$2}" 2> /dev/null
     done
