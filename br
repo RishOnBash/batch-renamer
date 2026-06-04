@@ -13,12 +13,15 @@ Options:
     -n [prefix]        Sequential numeric naming (Default: 'file_01.ext')
     -u                 Rename files to unique UUIDv4 hashes
     -t                 Rename files using a chronological timestamp
-    -r                 Rename files to random alphanumeric strings
+    -r [length]        Rename files to random alnum strings (Default: 15)
+    -l                 Convert all filenames to lowercase
+    -s                 Replace spaces in filenames with underscores
     -h                 Display this help message and exit
 
 Examples:
     ${0##*/} -e mp4 mkv      Change all .mp4 files to .mkv
     ${0##*/} -n photo        Rename files to photo_01, photo_02, etc.
+    ${0##*/} -r 24           Rename files to 24-character random strings
 
 EOF
 }
@@ -26,33 +29,37 @@ EOF
 (($# < 1)) && { usage; exit 1; }
 
 add_ext() {
-    [[ -z "$1" ]] && { echo "Usage: br -a <ext>"; return 1; }
+    [[ -z "$1" ]] &&
+        { echo "Usage: br -a <ext>"; return 1; }
 
     for f in *; do
-        [[ -e "$f" ]] || { echo "No files found!"; return 1; }
+        [[ -e "$f" ]] ||
+            { echo "No files found!"; return 1; }
         [[ -f "$f" ]] || continue
         mv "$f" "${f}.${1}"
     done
 }
 
 chg_ext() {
-    [[ -z "$1" ]] || [[ -z "$2" ]] && \
+    [[ -z "$1" ]] || [[ -z "$2" ]] && 
         { echo "Usage: br -e <old_ext> <new_ext>"; return 1; }
     
     for f in *; do
-        [[ -e "$f" ]] || { echo "No files found!"; return 1; }
+        [[ -e "$f" ]] || 
+            { echo "No files found!"; return 1; }
         [[ -f "$f" ]] || continue
-        if [[ "${f##*.}" == "$1" ]]; then
+        [[ "${f##*.}" == "$1" ]] &&
             mv "$f" "${f%.$1}.$2" 2> /dev/null
-        fi
     done
 }
 
 chg_all() {
-    [[ -z "$1" ]] && { echo "Usage: br -f <ext>"; return 1; }
+    [[ -z "$1" ]] &&
+        { echo "Usage: br -f <ext>"; return 1; }
 
     for f in *; do
-        [[ -e "$f" ]] || { echo "No files found!"; return 1; }
+        [[ -e "$f" ]] || 
+            { echo "No files found!"; return 1; }
         [[ -f "$f" ]] || continue
         mv "$f" "${f%.*}.${1}"
     done
@@ -60,7 +67,8 @@ chg_all() {
 
 uuid_name() {
     for f in *; do
-        [[ -e "$f" ]] || { echo "No files found!"; return 1; }
+        [[ -e "$f" ]] || 
+            { echo "No files found!"; return 1; }
         [[ -f "$f" ]] || continue
         mv "$f" "$(uuidgen).${f##*.}"
     done
@@ -69,7 +77,8 @@ uuid_name() {
 time_name() {
     local count=1
     for f in *; do
-        [[ -e "$f" ]] || { echo "No files found!"; return 1; }
+        [[ -e "$f" ]] || 
+            { echo "No files found!"; return 1; }
         [[ -f "$f" ]] || continue
         local datetime=$(date +"%Y%m%d_%H%M%S")
         local pad_count=$(printf "%02d" "$count") 
@@ -81,7 +90,8 @@ time_name() {
 num_name() {
     local count=1
     for f in *; do
-        [[ -e "$f" ]] || { echo "No files found!"; return 1; }
+        [[ -e "$f" ]] || 
+            { echo "No files found!"; return 1; }
         [[ -f "$f" ]] || continue
         local pad_count=$(printf "%02d" "$count")
         mv "$f" "${1:-file}_${pad_count}.${f##*.}"
@@ -91,13 +101,37 @@ num_name() {
 
 rand_name() {
     for f in *; do
-        [[ -e "$f" ]] || { echo "No files found!"; return 1; }
+        [[ -e "$f" ]] || 
+            { echo "No files found!"; return 1; }
         [[ -f "$f" ]] || continue
-        local rand=$(tr -cd 'a-z0-9' </dev/urandom | head -c15)
+        local rand=$(tr -cd 'a-z0-9' </dev/urandom | 
+            head -c ${1:-15})
         mv "$f" "${rand}.${f##*.}"
     done
 }
 
+lower_all() {
+    for f in *; do
+        [[ -e "$f" ]] ||
+            { echo "No files found!"; return 1; }
+        [[ -f "$f" ]] || continue
+
+        [[ "$" != "${f,,}" ]] &&
+            mv "$f" "${f,,}" 2> /dev/null
+    done
+}
+
+underscore() {
+    for f in *; do
+        [[ -e "$f" ]] ||
+            { echo "No files found!"; return 1; }
+        [[ -f "$f" ]] || continue
+
+        [[ "$f" == *" "* ]] &&
+            mv "$f" "${f// /_}" 2> /dev/null
+    done
+}
+    
 case "$1" in
     -a ) add_ext "$2" ;;
     -e ) chg_ext "$2" "$3" ;;
@@ -105,7 +139,9 @@ case "$1" in
     -u ) uuid_name ;;
     -t ) time_name ;;
     -n ) num_name "$2" ;;
-    -r ) rand_name ;;
+    -r ) rand_name "$2" ;;
+    -l ) lower_all ;;
+    -s ) underscore ;;
     -h ) usage ;;
     * ) echo "Invalid option: $1"
         echo "Try, ${0##*/} -h to see usage"; exit 1 ;;
