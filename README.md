@@ -6,9 +6,9 @@ A lightweight, zero-dependency POSIX Bash utility designed for blazingly fast bu
 
 ## Why?
 
-I like simple things, things which does the job and are easy to remember. I did'nt like rename command to change extension, e.g., to change png to jpg using rename would be, `rename 's/\.png$/\.jpg/' *.jpg` and that is lot of typing and memorization to do, mine is just `br -e png jpg`.
+I like simple things, things which does the job and are easy to remember.Renaming files, organising them are some of the things i do lot.
 
-Renaming files, organising them are some of the things i do lot. There's lot of stuff that needs to be done. Most of the bugs need to be fixed.
+I did'nt like rename command to change extension, e.g., to change png to jpg using rename would be, `rename 's/\.png$/\.jpg/' *.jpg` and that is lot of typing and memorization to do, mine is just `br -e png jpg`. Apart from this there are lot of other which can be done easily.
 
 ## Features
 
@@ -54,13 +54,17 @@ Options:
     -n [prefix]        Sequential numeric naming (Default: 'file_01.ext')
     -u                 Rename files to unique UUIDv4 hashes
     -t                 Rename files using a chronological timestamp
-    -r                 Rename files to random alphanumeric strings
+    -r [length]        Rename files to random alnum strings (Default: 15)
+    -l                 Convert all filenames to lowercase
+    -s                 Replace spaces in filenames with underscores
     -h                 Display this help message and exit
 
 Examples:
     br -e mp4 mkv      Change all .mp4 files to .mkv
     br -n photo        Rename files to photo_01, photo_02, etc.
+    br -r 24           Rename files to 24-character random strings
 ```
+
 ## Examples
 
 ### Add extension (-a)
