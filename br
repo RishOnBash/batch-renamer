@@ -1,5 +1,13 @@
 #!/usr/bin/env bash
-
+#
+#
+# Batch file renamer using parameter expansion
+#
+# Author: Rish
+# Date: June 9, 2026
+# License: MIT
+#
+#
 usage() {
     cat << EOF
 Usage: ${0##*/} [OPTION] [ARGUMENT]
@@ -116,7 +124,7 @@ lower_all() {
             { echo "No files found!"; return 1; }
         [[ -f "$f" ]] || continue
 
-        [[ "$" != "${f,,}" ]] &&
+        [[ "$f" != "${f,,}" ]] &&
             mv "$f" "${f,,}" 2> /dev/null
     done
 }
